@@ -1,39 +1,29 @@
-import { studentsCollection } from "../server.js";
+import * as studentService from "../service/students.service.js";
 
-const addStudent = async (req, res) => {
+const createStudent = async (req, res) => {
   try {
-
-    const { name, email, course, marks } = req.body;
-
-    const newStudent = {
-      name,
-      email,
-      course,
-      marks,
-      createdAt: new Date()
-    };
-
-    const result = await studentsCollection.insertOne(newStudent);
-
+    const result = await studentService.addStudent(req.body);
     res.status(201).json({
       message: "Student added successfully",
       data: result
     });
-
   } catch (error) {
-    res.status(500).json({
-      message: "Error adding student",
-      error: error.message
+    res.status(400).json({
+      message: error.message || "Error adding student",
     });
   }
 };
 
 const getStudents = async (req, res) => {
-
-  const students = await studentsCollection.find().toArray();
-
-  res.json(students);
-
+  try {
+    const students = await studentService.getAllStudents();
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching students",
+      error: error.message
+    });
+  }
 };
 
-export { addStudent, getStudents };
+export { createStudent, getStudents };
